@@ -1,0 +1,40 @@
+name: FlavorFusion
+description: A modern platform to discover and share amazing recipes.
+
+entities:
+  User:
+    authenticable: true
+    properties:
+      - { name: name, validation: { required: true } }
+      - { name: email, type: email, validation: { required: true, unique: true } }
+      - { name: avatar, type: image, options: { sizes: { thumbnail: { width: 100, height: 100 } } } }
+      - { name: role, type: choice, options: { values: [chef, admin], default: chef } }
+    access_policies:
+      - role: admin
+        permissions: [create, read, update, delete]
+      - role: chef
+        permissions: [read]
+      - role: chef
+        permissions: [update, delete]
+        condition: "user.id === id"
+
+  Recipe:
+    properties:
+      - { name: title, validation: { required: true } }
+      - { name: description, type: text, validation: { required: true } }
+      - { name: ingredients, type: text, validation: { required: true } }
+      - { name: instructions, type: text, validation: { required: true } }
+      - { name: prepTime, type: number, options: { label: 'Prep Time (minutes)' } }
+      - { name: cookTime, type: number, options: { label: 'Cook Time (minutes)' } }
+      - { name: image, type: image, options: { sizes: { card: { width: 400, height: 300 } } } }
+      - { name: status, type: choice, options: { values: [draft, published], default: draft } }
+    belongsTo:
+      - { name: owner, entity: User }
+    access_policies:
+      - role: admin
+        permissions: [create, read, update, delete]
+      - role: chef
+        permissions: [create, read]
+      - role: chef
+        permissions: [update, delete]
+        condition: "user.id === owner.id"
